@@ -209,7 +209,7 @@ describe('The Frame Component', () => {
     const initialContent =
       '<!DOCTYPE html><html><head><script>console.log("foo");</script></head><body><div></div></body></html>';
     const renderedContent =
-      '<html><head><script>console.log("foo");</script></head><body><div><div class="frame-content"></div></div></body></html>';
+      '<html><head><script>console.log("foo");</script></head><body><div></div></body></html>';
     const frame = ReactDOM.render(
       <Frame initialContent={initialContent} />,
       div

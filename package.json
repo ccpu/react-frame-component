@@ -1,5 +1,5 @@
 {
-  "name": "react-frame-component",
+  "name": "react-frame-component-fork",
   "version": "4.1.3",
   "description": "React component to wrap your application or component in an iFrame for encapsulation purposes",
   "main": "lib/index.js",
