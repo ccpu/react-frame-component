@@ -29368,7 +29368,6 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.Frame = undefined;
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
@@ -29400,7 +29399,7 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var Frame = exports.Frame = function (_Component) {
+	var Frame = function (_Component) {
 	  _inherits(Frame, _Component);
 	
 	  // React warns when you render directly into the body since browser extensions
@@ -29412,25 +29411,11 @@
 	
 	    var _this = _possibleConstructorReturn(this, (Frame.__proto__ || Object.getPrototypeOf(Frame)).call(this, props, context));
 	
-	    _this.setRef = function (node) {
-	      _this.nodeRef.current = node;
-	
-	      var forwardedRef = _this.props.forwardedRef; // eslint-disable-line react/prop-types
-	
-	      if (typeof forwardedRef === 'function') {
-	        forwardedRef(node);
-	      } else if (forwardedRef) {
-	        forwardedRef.current = node;
-	      }
-	    };
-	
 	    _this.handleLoad = function () {
-	      _this.setState({ iframeLoaded: true });
+	      _this.forceUpdate();
 	    };
 	
 	    _this._isMounted = false;
-	    _this.nodeRef = _react2.default.createRef();
-	    _this.state = { iframeLoaded: false };
 	    return _this;
 	  }
 	
@@ -29443,7 +29428,7 @@
 	      if (doc && doc.readyState === 'complete') {
 	        this.forceUpdate();
 	      } else {
-	        this.nodeRef.current.addEventListener('load', this.handleLoad);
+	        this.node.addEventListener('load', this.handleLoad);
 	      }
 	    }
 	  }, {
@@ -29451,12 +29436,12 @@
 	    value: function componentWillUnmount() {
 	      this._isMounted = false;
 	
-	      this.nodeRef.current.removeEventListener('load', this.handleLoad);
+	      this.node.removeEventListener('load', this.handleLoad);
 	    }
 	  }, {
 	    key: 'getDoc',
 	    value: function getDoc() {
-	      return this.nodeRef.current ? this.nodeRef.current.contentDocument : null; // eslint-disable-line
+	      return this.node ? this.node.contentDocument : null; // eslint-disable-line
 	    }
 	  }, {
 	    key: 'getMountTarget',
@@ -29501,6 +29486,12 @@
 	        )
 	      );
 	
+	      if (doc.body.children.length < 1) {
+	        doc.open('text/html', 'replace');
+	        doc.write(this.props.initialContent);
+	        doc.close();
+	      }
+	
 	      var mountTarget = this.getMountTarget();
 	
 	      return [_reactDom2.default.createPortal(this.props.head, this.getDoc().head), _reactDom2.default.createPortal(contents, mountTarget)];
@@ -29508,8 +29499,9 @@
 	  }, {
 	    key: 'render',
 	    value: function render() {
+	      var _this2 = this;
+	
 	      var props = _extends({}, this.props, {
-	        srcDoc: this.props.initialContent,
 	        children: undefined // The iframe isn't ready so we drop children from props here. #12, #17
 	      });
 	      delete props.head;
@@ -29517,11 +29509,14 @@
 	      delete props.mountTarget;
 	      delete props.contentDidMount;
 	      delete props.contentDidUpdate;
-	      delete props.forwardedRef;
 	      return _react2.default.createElement(
 	        'iframe',
-	        _extends({}, props, { ref: this.setRef, onLoad: this.handleLoad }),
-	        this.state.iframeLoaded && this.renderFrameContents()
+	        _extends({}, props, {
+	          ref: function ref(node) {
+	            _this2.node = node;
+	          }
+	        }),
+	        this.renderFrameContents()
 	      );
 	    }
 	  }]);
@@ -29545,11 +29540,9 @@
 	  mountTarget: undefined,
 	  contentDidMount: function contentDidMount() {},
 	  contentDidUpdate: function contentDidUpdate() {},
-	  initialContent: '<!DOCTYPE html><html><head></head><body><div class="frame-root"></div></body></html>'
+	  initialContent: '<!DOCTYPE html><html><head></head><body><div class="root"></div></body></html>'
 	};
-	exports.default = _react2.default.forwardRef(function (props, ref) {
-	  return _react2.default.createElement(Frame, _extends({}, props, { forwardedRef: ref }));
-	});
+	exports.default = Frame;
 
 /***/ },
 /* 22 */
