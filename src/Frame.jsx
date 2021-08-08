@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { FrameContextProvider } from './Context';
 import Content from './Content';
 
-export class Frame extends Component {
+export default class Frame extends Component {
   // React warns when you render directly into the body since browser extensions
   // also inject into the body and can mess up React. For this reason
   // initialContent is expected to have a div inside of the body
@@ -30,14 +30,12 @@ export class Frame extends Component {
     contentDidMount: () => {},
     contentDidUpdate: () => {},
     initialContent:
-      '<!DOCTYPE html><html><head></head><body><div class="frame-root"></div></body></html>'
+      '<!DOCTYPE html><html><head></head><body><div class="root"></div></body></html>'
   };
 
   constructor(props, context) {
     super(props, context);
     this._isMounted = false;
-    this.nodeRef = React.createRef();
-    this.state = { iframeLoaded: false };
   }
 
   componentDidMount() {
@@ -47,18 +45,18 @@ export class Frame extends Component {
     if (doc && doc.readyState === 'complete') {
       this.forceUpdate();
     } else {
-      this.nodeRef.current.addEventListener('load', this.handleLoad);
+      this.node.addEventListener('load', this.handleLoad);
     }
   }
 
   componentWillUnmount() {
     this._isMounted = false;
 
-    this.nodeRef.current.removeEventListener('load', this.handleLoad);
+    this.node.removeEventListener('load', this.handleLoad);
   }
 
   getDoc() {
-    return this.nodeRef.current ? this.nodeRef.current.contentDocument : null; // eslint-disable-line
+    return this.node ? this.node.contentDocument : null; // eslint-disable-line
   }
 
   getMountTarget() {
@@ -69,19 +67,8 @@ export class Frame extends Component {
     return doc.body.children[0];
   }
 
-  setRef = node => {
-    this.nodeRef.current = node;
-
-    const { forwardedRef } = this.props; // eslint-disable-line react/prop-types
-    if (typeof forwardedRef === 'function') {
-      forwardedRef(node);
-    } else if (forwardedRef) {
-      forwardedRef.current = node;
-    }
-  };
-
   handleLoad = () => {
-    this.setState({ iframeLoaded: true });
+    this.forceUpdate();
   };
 
   renderFrameContents() {
@@ -110,6 +97,12 @@ export class Frame extends Component {
       </Content>
     );
 
+    if (doc.body.children.length < 1) {
+      doc.open('text/html', 'replace');
+      doc.write(this.props.initialContent);
+      doc.close();
+    }
+
     const mountTarget = this.getMountTarget();
 
     return [
@@ -121,7 +114,6 @@ export class Frame extends Component {
   render() {
     const props = {
       ...this.props,
-      srcDoc: this.props.initialContent,
       children: undefined // The iframe isn't ready so we drop children from props here. #12, #17
     };
     delete props.head;
@@ -129,15 +121,15 @@ export class Frame extends Component {
     delete props.mountTarget;
     delete props.contentDidMount;
     delete props.contentDidUpdate;
-    delete props.forwardedRef;
     return (
-      <iframe {...props} ref={this.setRef} onLoad={this.handleLoad}>
-        {this.state.iframeLoaded && this.renderFrameContents()}
+      <iframe
+        {...props}
+        ref={node => {
+          this.node = node;
+        }}
+      >
+        {this.renderFrameContents()}
       </iframe>
     );
   }
 }
-
-export default React.forwardRef((props, ref) => (
-  <Frame {...props} forwardedRef={ref} />
-));
