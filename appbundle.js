@@ -29411,11 +29411,15 @@
 	
 	    var _this = _possibleConstructorReturn(this, (Frame.__proto__ || Object.getPrototypeOf(Frame)).call(this, props, context));
 	
-	    _this.handleLoad = function () {
-	      _this.forceUpdate();
+	    _this.handleLoad = function (e) {
+	      _this.setState({ iframeLoaded: true });
+	      if (_this.props.onLoad) {
+	        _this.props.onLoad(e);
+	      }
 	    };
 	
 	    _this._isMounted = false;
+	    _this.state = { iframeLoaded: false };
 	    return _this;
 	  }
 	
@@ -29509,9 +29513,10 @@
 	        _extends({}, props, {
 	          ref: function ref(node) {
 	            _this2.node = node;
-	          }
+	          },
+	          onLoad: this.handleLoad
 	        }),
-	        this.renderFrameContents()
+	        this.state.iframeLoaded && this.renderFrameContents()
 	      );
 	    }
 	  }]);
