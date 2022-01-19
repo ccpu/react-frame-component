@@ -29465,7 +29465,6 @@
 	    value: function getMountTarget() {
 	      var doc = this.getDoc();
 	      if (this.props.mountTarget) {
-	        console.log(this.props.mountTarget);
 	        return doc.querySelector(this.props.mountTarget);
 	      }
 	      return doc.body.children[0];
