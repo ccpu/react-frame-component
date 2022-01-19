@@ -29465,6 +29465,7 @@
 	    value: function getMountTarget() {
 	      var doc = this.getDoc();
 	      if (this.props.mountTarget) {
+	        console.log(this.props.mountTarget);
 	        return doc.querySelector(this.props.mountTarget);
 	      }
 	      return doc.body.children[0];
@@ -29544,7 +29545,7 @@
 	  style: {},
 	  head: null,
 	  children: undefined,
-	  mountTarget: undefined,
+	  mountTarget: 'body',
 	  contentDidMount: function contentDidMount() {},
 	  contentDidUpdate: function contentDidUpdate() {},
 	  initialContent: '<!DOCTYPE html><html><head></head><body></body></html>'
