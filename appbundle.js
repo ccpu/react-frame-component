@@ -29547,7 +29547,7 @@
 	  mountTarget: undefined,
 	  contentDidMount: function contentDidMount() {},
 	  contentDidUpdate: function contentDidUpdate() {},
-	  initialContent: '<!DOCTYPE html><html><head></head><body><div class="root"></div></body></html>'
+	  initialContent: '<!DOCTYPE html><html><head></head><body></body></html>'
 	};
 	exports.default = _react2.default.forwardRef(function (props, ref) {
 	  return _react2.default.createElement(Frame, _extends({}, props, { forwardedRef: ref }));
